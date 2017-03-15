@@ -59,8 +59,20 @@ function bindMouseWheelHandler(element, i) {
     return [deltaX, deltaY];
   }
 
-  function shouldBeConsumedByChild(deltaX, deltaY) {
+  function isScrollable(el, axis) {
+    var style = window.getComputedStyle(el, null);
+    return ['auto', 'scroll'].includes(style.getPropertyValue('overflow-' + axis));
+  }
+
+  function traverseForScrollableChild(child, axis) {
+    if (child === element) return;
+    if (isScrollable(child, axis)) return child;
+    return traverseForScrollableChild(child.parentNode, axis);
+  }
+
+  function shouldBeConsumedByChild(target, deltaX, deltaY) {
     var child = element.querySelector('textarea:hover, select[multiple]:hover, .ps-child:hover');
+
     if (child) {
       if (!window.getComputedStyle(child).overflow.match(/(scroll|auto)/)) {
         // if not scrollable
@@ -80,6 +92,13 @@ function bindMouseWheelHandler(element, i) {
         }
       }
     }
+
+    var scrollableChild = traverseForScrollableChild(target, deltaX ? 'x' : 'y');
+
+    if (scrollableChild) {
+      return true;
+    }
+
     return false;
   }
 
@@ -89,7 +108,7 @@ function bindMouseWheelHandler(element, i) {
     var deltaX = delta[0];
     var deltaY = delta[1];
 
-    if (shouldBeConsumedByChild(deltaX, deltaY)) {
+    if (shouldBeConsumedByChild(e.target, deltaX, deltaY)) {
       return;
     }
 
