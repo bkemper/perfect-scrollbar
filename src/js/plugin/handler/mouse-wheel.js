@@ -93,6 +93,11 @@ function bindMouseWheelHandler(element, i) {
       }
     }
 
+    // It is pretty annoying that you have to tag every child with class="ps-child"
+    // to allow for native style to work correctly
+    //
+    // @see https://github.com/noraesae/perfect-scrollbar/issues/592
+    // @see https://github.com/noraesae/perfect-scrollbar#scrolling-children-inside-perfect-scrollbar
     var scrollableChild = traverseForScrollableChild(target, deltaX ? 'x' : 'y');
 
     if (scrollableChild) {
